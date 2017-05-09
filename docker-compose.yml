@@ -1,0 +1,39 @@
+version: '2'
+
+services:
+  base:
+    build: .
+    volumes:
+      - "$HOME/.aws:/root/.aws"
+      - ".:/root/src/github.com/MYOB-Technology/ops-go-cfn"
+    environment:
+      GOPATH: /root
+      AWS_REGION: ap-southeast-2
+    working_dir: /root/src/github.com/MYOB-Technology/ops-go-cfn
+
+  build:
+    extends:
+      service: base
+    environment:
+      GOOS: linux
+      GOARCH: amd64
+    command: make build
+
+  test:
+    extends:
+      service: base
+    command: make test
+
+  provision:
+    extends:
+      service: base
+    environment:
+      ACTION: provision
+    command: make run
+
+  delete:
+    extends:
+      service: base
+    environment:
+      ACTION: delete
+    command: make run

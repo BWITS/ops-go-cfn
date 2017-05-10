@@ -46,13 +46,13 @@ func main() {
 			BucketName: *bucket,
 			Timeout:    *timeout,
 		}
-		status, err := actions.Provision(svc, cfg)
+		status, err := actions.Provision(&svc, &cfg)
 		if err != nil {
 			log.Fatal(err)
 		}
 		fmt.Printf("Stack - %s\n", status)
 	case "delete":
-		status, err := actions.Delete(svc, name)
+		status, err := actions.Delete(&svc, *name)
 		if err != nil {
 			log.Fatal(err)
 		}

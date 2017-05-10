@@ -11,17 +11,17 @@ import (
 
 // Provision a CloudFormation stack
 
-func Provision(svc stack.Service, cfg stack.Config) (status string, err error) {
-	i := stack.Info(&svc)
-	ctrl := stack.Controller(&svc)
-	waiter := stack.Waiter(&svc)
+func Provision(svc *stack.Service, cfg *stack.Config) (status string, err error) {
+	i := stack.Info(svc)
+	ctrl := stack.Controller(svc)
+	waiter := stack.Waiter(svc)
 	exists, _ := i.Exists(&cfg.StackName)
 	rollback, _ := i.Rollback(&cfg.StackName)
 
 	switch {
 	case exists && rollback:
 		ctrl.Delete(&cfg.StackName) //	should the user	be warned about	this?
-		_, err = ctrl.Create(&cfg)
+		_, err = ctrl.Create(cfg)
 		if err != nil {
 			log.Fatal(err)
 			return
@@ -29,7 +29,7 @@ func Provision(svc stack.Service, cfg stack.Config) (status string, err error) {
 		waiter.WaitCreate(&cfg.StackName)
 
 	case exists:
-		_, err = ctrl.Update(&cfg)
+		_, err = ctrl.Update(cfg)
 		if err != nil {
 			// TODO if AWS change this text, this'll break
 			if strings.Contains(err.Error(), "ValidationError: No updates are to be performed.") {
@@ -41,7 +41,7 @@ func Provision(svc stack.Service, cfg stack.Config) (status string, err error) {
 		waiter.WaitUpdate(&cfg.StackName)
 
 	default:
-		_, err = ctrl.Create(&cfg)
+		_, err = ctrl.Create(cfg)
 		if err != nil {
 			log.Fatal(err)
 			return
